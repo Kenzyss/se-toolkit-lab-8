@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv *)",
+      "Bash(mkdir *)",
+      "Bash(curl *)",
+      "Bash(docker-compose *)",
+      "Bash(git submodule *)",
+      "Bash(sleep *)",
+      "Bash(timeout *)",
+      "Bash(true)",
+      "Bash(psql *)",
+      "Bash(sudo *)"
+    ]
+  },
+  "$version": 3
+}
