@@ -30,8 +30,9 @@ COPY --from=workspace nanobot-websocket-channel /app/nanobot-websocket-channel
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
 
-# Install MCP servers in the venv
-RUN uv pip install -e /app/mcp/mcp_lms -e /app/mcp/mcp_observability --venv /app/.venv
+# Install MCP servers into the venv
+ENV VIRTUAL_ENV=/app/.venv
+RUN uv pip install -e /app/mcp/mcp_lms -e /app/mcp/mcp_observability
 
 # ---
 # Stage 2: Final image
@@ -53,7 +54,7 @@ COPY --from=builder --chown=nonroot:nonroot /app /app
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app/nanobot"
+ENV PYTHONPATH="/app/nanobot:/app/mcp"
 
 USER nonroot
 WORKDIR /app
