@@ -1,26 +1,21 @@
-<!-- Provide a general summary of your changes in the Title above -->
+## Description
 
-## Summary
+<!-- Describe what this PR does and why -->
 
-<!-- What does this PR do?
+## Related Issue
 
-Replace <issue-number> with the number of the corresponding task issue.
-
-Add more details if necessary.
--->
-
-- Closes #<issue-number>
-
----
+Closes #...
 
 ## Checklist
 
-<!-- Go over all the following points, and put an `x` in all the boxes that apply. -->
-<!-- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
+- [ ] I have tested this locally
+- [ ] I have reviewed my own code
+- [ ] I have updated documentation if needed
+- [ ] All acceptance criteria are met
 
-- [ ] I made this PR to the `main` branch **of my fork (NOT the course instructors' repo)**.
-- [ ] I see `base: main` <- `compare: <branch>` above the PR title.
-- [ ] I edited the line `- Closes #<issue-number>`.
-- [ ] I wrote clear commit messages.
-- [ ] I reviewed my own diff before requesting review.
-- [ ] I understand the changes I’m submitting.
+## Type of Change
+
+- [ ] Bug fix (non-breaking change that fixes an issue)
+- [ ] New feature (non-breaking change that adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to change)
+- [ ] Documentation update
