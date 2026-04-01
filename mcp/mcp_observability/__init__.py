@@ -68,13 +68,30 @@ class _TracesGetArgs(BaseModel):
 
 
 async def _query_victorialogs(query: str, limit: int = 30, start: str = "1h") -> list[dict]:
-    """Query VictoriaLogs using LogsQL."""
+    """Query VictoriaLogs using LogsQL.
+    
+    VictoriaLogs returns JSONL (JSON Lines) format, not pure JSON.
+    Each line is a separate JSON object.
+    """
     url = f"{_logs_url}/select/logsql/query"
     params = {"query": query, "limit": limit, "start": start}
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=params, timeout=30.0)
         response.raise_for_status()
-        return response.json()
+        text = response.text.strip()
+        if not text:
+            return []
+        # Parse JSONL format (each line is a JSON object)
+        results = []
+        for line in text.split('\n'):
+            line = line.strip()
+            if line:
+                try:
+                    results.append(json.loads(line))
+                except json.JSONDecodeError:
+                    # Skip malformed lines
+                    continue
+        return results
 
 
 async def _query_victoriatraces_traces(service: str, limit: int = 10) -> list[dict]:
