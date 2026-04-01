@@ -138,10 +138,22 @@ async def _logs_search(args: _LogsSearchArgs) -> list[TextContent]:
 
 
 async def _logs_error_count(args: _LogsErrorCountArgs) -> list[TextContent]:
-    """Count errors per service over a time window."""
-    query = f'level:error | stats by (service) count() | sort by (_time:desc) | start={args.start}'
+    """Count errors per service over a time window.
+    
+    VictoriaLogs LogsQL syntax: `level:error | stats by (field) count()`
+    Returns empty list if no errors found (which is a valid healthy state).
+    """
+    query = f'level:error | stats by (service) count()'
     try:
-        results = await _query_victorialogs(query, limit=100)
+        results = await _query_victorialogs(query, limit=100, start=args.start)
+        # Empty results = no errors found (healthy state)
+        if not results:
+            return _text({
+                "status": "healthy",
+                "message": "No errors found in the specified time window",
+                "time_window": args.start,
+                "error_count": 0,
+            })
         return _text(results)
     except httpx.HTTPError as e:
         return _text({"error": f"VictoriaLogs query failed: {e}"})
