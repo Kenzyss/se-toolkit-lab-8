@@ -413,15 +413,42 @@ se-toolkit-lab-8-qwen-code-api-1    Up 2 hours (healthy)
 
 ## Task 2B — Web client
 
-**Flutter web client screenshot:**
+**Flutter conversation transcript:**
+
+User: `What can you do in this system?`
+
+Agent response:
+```
+I'm **nanobot** 🐈, your personal AI assistant. Here's what I can do in this system:
+
+## Core Capabilities
+
+### 📁 File & System Operations
+- Read, write, and edit files
+- List directory contents
+- Execute shell commands (with safety limits)
+- Manage your workspace at `/app/nanobot/workspace`
+
+### 🌐 Web & Information
+- Search the web for information
+- Fetch and extract content from URLs
+- Access external resources and APIs
+
+### ⏰ Scheduling & Reminders
+- Schedule one-time reminders
+- Set up recurring tasks with cron expressions
+- Manage periodic tasks via `HEARTBEAT.md`
+
+### 📚 Learning Management (LMS)
+- View available labs and learners
+- Check pass rates, completion rates, and timelines
+- Get group performance and top learner rankings
+- Trigger sync pipelines
+```
+
+**Screenshot:**
 
 ![Flutter chat with nanobot](Pasted%20image.png)
-
-The agent responds with its capabilities including:
-- File & System Operations
-- Web & Information
-- Scheduling & Reminders
-- Learning Management (LMS) — view labs, learners, pass rates, completion rates, timelines, group performance
 
 ## Task 3A — Structured logging
 
