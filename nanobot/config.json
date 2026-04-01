@@ -47,15 +47,17 @@
         "args": ["-m", "mcp_lms"],
         "env": {
           "NANOBOT_LMS_BACKEND_URL": "http://localhost:42001",
-          "NANOBOT_LMS_API_KEY": "lms-api-key-secret-12345"
+          "NANOBOT_LMS_API_KEY": "lms-api-key-secret-12345",
+          "PYTHONPATH": "/app"
         }
       },
       "observability": {
         "command": "python",
         "args": ["-m", "mcp_observability"],
         "env": {
-          "VICTORIALOGS_URL": "http://localhost:9428",
-          "VICTORIATRACES_URL": "http://localhost:10428"
+          "VICTORIALOGS_URL": "http://victorialogs:9428",
+          "VICTORIATRACES_URL": "http://victoriatraces:10428",
+          "PYTHONPATH": "/app"
         }
       }
     }
