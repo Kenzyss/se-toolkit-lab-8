@@ -11,14 +11,14 @@ ENV UV_PYTHON_DOWNLOADS=0
 
 WORKDIR /app
 COPY --from=workspace pyproject.toml uv.lock /app/
-COPY nanobot/pyproject.toml /app/nanobot/pyproject.toml
+COPY pyproject.toml /app/nanobot/pyproject.toml
 
 # Sync nanobot dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-workspace --package nanobot-ai
 
-# Copy nanobot source
-COPY nanobot /app/nanobot
+# Copy nanobot source (build context is ./nanobot)
+COPY . /app/nanobot
 
 # Sync with workspace to get MCP server
 RUN --mount=type=cache,target=/root/.cache/uv \

@@ -388,11 +388,40 @@ The skill prompt teaches the agent:
 
 ## Task 2A — Deployed agent
 
-<!-- Paste a short nanobot startup log excerpt showing the gateway started inside Docker -->
+**Nanobot gateway startup log:**
+
+```
+nanobot-1  | [entrypoint] Resolved config written to /app/nanobot/config.resolved.json
+nanobot-1  | Using config: /app/nanobot/config.resolved.json
+nanobot-1  | 🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
+nanobot-1  | 2026-04-01 16:24:51.640 | INFO     | nanobot.channels.manager:_init_channels:58 - WebChat channel enabled
+nanobot-1  | ✓ Channels enabled: webchat
+nanobot-1  | 2026-04-01 16:24:53.632 | DEBUG    | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_health' from server 'lms'
+nanobot-1  | 2026-04-01 16:24:53.632 | DEBUG    | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_labs' from server 'lms'
+nanobot-1  | 2026-04-01 16:24:53.633 | INFO     | nanobot.agent.tools.mcp:connect_mcp_servers:246 - MCP server 'lms': connected, 9 tools registered
+nanobot-1  | 2026-04-01 16:24:53.633 | INFO     | nanobot.agent.loop:run:280 - Agent loop started
+```
+
+**Services running:**
+```
+NAME                                STATUS
+se-toolkit-lab-8-backend-1          Up 5 days
+se-toolkit-lab-8-caddy-1            Up About a minute
+se-toolkit-lab-8-nanobot-1          Up About a minute
+se-toolkit-lab-8-qwen-code-api-1    Up 2 hours (healthy)
+```
 
 ## Task 2B — Web client
 
-<!-- Screenshot of a conversation with the agent in the Flutter web app -->
+**Flutter web client screenshot:**
+
+![Flutter chat with nanobot](Pasted%20image.png)
+
+The agent responds with its capabilities including:
+- File & System Operations
+- Web & Information
+- Scheduling & Reminders
+- Learning Management (LMS) — view labs, learners, pass rates, completion rates, timelines, group performance
 
 ## Task 3A — Structured logging
 
