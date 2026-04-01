@@ -13,7 +13,11 @@
   },
   "channels": {
     "sendProgress": true,
-    "sendToolHints": false
+    "sendToolHints": false,
+    "webchat": {
+      "enabled": true,
+      "allow_from": ["*"]
+    }
   },
   "providers": {
     "custom": {
