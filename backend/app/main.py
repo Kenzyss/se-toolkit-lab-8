@@ -12,8 +12,11 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import Response
 
 from app.auth import verify_api_key
+from app.database import get_session
 from app.routers import analytics, interactions, items, learners, pipeline
 from app.settings import settings
+from sqlmodel import select, text
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +80,32 @@ async def log_requests(request: Request, call_next: RequestResponseEndpoint) -> 
         },
     )
     return response
+
+
+@app.get("/health")
+async def health_check(session: AsyncSession = Depends(get_session)):
+    """Health check endpoint for monitoring and orchestration."""
+    try:
+        # Check database connectivity
+        await session.exec(text("SELECT 1"))
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "service": settings.app_name,
+        }
+    except Exception as e:
+        logger.error(
+            "health_check_failed",
+            extra={"event": "health_check_failed", "error": str(e)},
+        )
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "unhealthy",
+                "database": "disconnected",
+                "error": str(e),
+            },
+        )
 
 
 app.add_middleware(
