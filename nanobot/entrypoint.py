@@ -35,6 +35,7 @@ def main():
     if "mcpServers" in config.get("tools", {}):
         if "lms" in config["tools"]["mcpServers"]:
             config["tools"]["mcpServers"]["lms"]["env"] = {
+                "PYTHONPATH": "/app/nanobot:/app/mcp",
                 "NANOBOT_LMS_BACKEND_URL": os.environ.get(
                     "NANOBOT_LMS_BACKEND_URL",
                     config["tools"]["mcpServers"]["lms"]["env"].get(
@@ -50,6 +51,7 @@ def main():
             }
         if "observability" in config["tools"]["mcpServers"]:
             config["tools"]["mcpServers"]["observability"]["env"] = {
+                "PYTHONPATH": "/app/nanobot:/app/mcp",
                 "VICTORIALOGS_URL": os.environ.get(
                     "VICTORIALOGS_URL",
                     config["tools"]["mcpServers"]["observability"]["env"].get(
