@@ -1,0 +1,20 @@
+[project]
+name = "mcp-observability"
+version = "0.1.0"
+description = "MCP server exposing VictoriaLogs and VictoriaTraces as typed tools"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.0.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.25.0",
+]
+
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mcp_observability"]
+
+[project.entry-points."nanobot.mcp"]
+observability = "mcp_observability"

@@ -48,6 +48,21 @@ def main():
                     ),
                 ),
             }
+        if "observability" in config["tools"]["mcpServers"]:
+            config["tools"]["mcpServers"]["observability"]["env"] = {
+                "VICTORIALOGS_URL": os.environ.get(
+                    "VICTORIALOGS_URL",
+                    config["tools"]["mcpServers"]["observability"]["env"].get(
+                        "VICTORIALOGS_URL", "http://localhost:9428"
+                    ),
+                ),
+                "VICTORIATRACES_URL": os.environ.get(
+                    "VICTORIATRACES_URL",
+                    config["tools"]["mcpServers"]["observability"]["env"].get(
+                        "VICTORIATRACES_URL", "http://localhost:10428"
+                    ),
+                ),
+            }
 
     # Write resolved config
     with open(resolved_path, "w") as f:

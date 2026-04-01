@@ -2,12 +2,15 @@
 members = [
     "backend",
     "mcp",
+    "mcp/mcp_lms",
+    "mcp/mcp_observability",
     "qwen-code-api",
     "nanobot",
 ]
 
 [tool.uv.sources]
 lms-mcp = { workspace = true }
+mcp-observability = { workspace = true }
 
 [dependency-groups]
 dev = [
