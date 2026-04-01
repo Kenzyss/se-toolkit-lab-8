@@ -20,6 +20,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Copy nanobot source (build context is ./nanobot)
 COPY . /app/nanobot
 
+# Copy MCP servers and other workspace packages
+COPY --from=workspace mcp/mcp_lms /app/mcp/mcp_lms
+COPY --from=workspace mcp/mcp_observability /app/mcp/mcp_observability
+COPY --from=workspace qwen-code-api /app/qwen-code-api
+COPY --from=workspace nanobot-websocket-channel /app/nanobot-websocket-channel
+
 # Sync with workspace to get MCP server
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
