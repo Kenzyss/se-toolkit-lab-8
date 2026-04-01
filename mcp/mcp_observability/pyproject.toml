@@ -14,7 +14,11 @@ requires = ["setuptools>=75.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["mcp_observability"]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mcp_observability*"]
 
 [project.entry-points."nanobot.mcp"]
 observability = "mcp_observability"
