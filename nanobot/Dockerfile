@@ -31,7 +31,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
 
 # Install MCP servers in the venv
-RUN /app/.venv/bin/pip install -e /app/mcp/mcp_lms -e /app/mcp/mcp_observability
+RUN uv pip install --system -e /app/mcp/mcp_lms -e /app/mcp/mcp_observability
 
 # ---
 # Stage 2: Final image
