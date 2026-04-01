@@ -1,7 +1,6 @@
 [tool.uv.workspace]
 members = [
     "backend",
-    "mcp",
     "mcp/mcp_lms",
     "mcp/mcp_observability",
     "qwen-code-api",
