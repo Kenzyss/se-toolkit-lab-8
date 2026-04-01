@@ -454,6 +454,8 @@ I'm **nanobot** 🐈, your personal AI assistant. Here's what I can do in this s
 
 ### Happy-path log excerpt (request_started → request_completed with status 200)
 
+**Structured log entries from `docker compose logs backend`:**
+
 ```
 backend-1  | 2026-04-01 18:06:12,640 INFO [app.main] [main.py:60] [trace_id=e067e1a90e24dd6776c2200a840f3cb0 span_id=79a8ba6b195b1531 resource.service.name=Learning Management Service trace_sampled=True] - request_started
 backend-1  | 2026-04-01 18:06:13,041 INFO [app.auth] [auth.py:30] [trace_id=e067e1a90e24dd6776c2200a840f3cb0 span_id=79a8ba6b195b1531 resource.service.name=Learning Management Service trace_sampled=True] - auth_success
@@ -462,13 +464,19 @@ backend-1  | 2026-04-01 18:06:14,264 INFO [app.main] [main.py:68] [trace_id=e067
 backend-1  | INFO:     172.21.0.7:42490 - "GET /items/ HTTP/1.1" 200 OK
 ```
 
-The structured log shows:
-- `request_started` — incoming request received
-- `auth_success` — API key verified
-- `db_query` — database query executed
-- `request_completed` — response sent with status 200
+**Structured fields in each log entry:**
 
-All entries share the same `trace_id=e067e1a90e24dd6776c2200a840f3cb0` for distributed tracing.
+| Field | Example Value |
+|-------|---------------|
+| `timestamp` | 2026-04-01 18:06:12,640 |
+| `level` | INFO |
+| `logger` | app.main |
+| `trace_id` | e067e1a90e24dd6776c2200a840f3cb0 |
+| `span_id` | 79a8ba6b195b1531 |
+| `resource.service.name` | Learning Management Service |
+| `event` | request_started |
+
+All entries share the same `trace_id` for distributed tracing correlation.
 
 ### Error-path log excerpt (db_query with error)
 
@@ -477,11 +485,11 @@ To trigger an error, stop PostgreSQL and make a request:
 ```bash
 docker compose --env-file .env.docker.secret stop postgres
 # Make a request via the agent or Flutter app
-# Check logs:
 docker compose --env-file .env.docker.secret logs backend --tail 30
 ```
 
-Expected error log:
+**Expected error log pattern:**
+
 ```
 backend-1  | ERROR [app.db.items] [items.py:XX] [trace_id=xxx span_id=yyy resource.service.name=Learning Management Service trace_sampled=True] - db_query
 backend-1  |   error: connection refused
@@ -492,7 +500,8 @@ backend-1  | INFO [app.main] [main.py:68] [...] - request_completed status: 500
 
 Open VictoriaLogs UI at `http://localhost:42010` or via proxy at `http://localhost:42002/utils/victorialogs/select/vmui`.
 
-Example LogsQL query to find backend errors:
+**Example LogsQL query to find backend errors:**
+
 ```
 _stream:{service="Learning Management Service"} AND level:error
 ```
@@ -505,7 +514,8 @@ _stream:{service="Learning Management Service"} AND level:error
 
 Open VictoriaTraces UI at `http://localhost:42011` or via proxy at `http://localhost:42002/utils/victoriatraces`.
 
-A healthy trace shows the span hierarchy:
+**A healthy trace shows the span hierarchy:**
+
 ```
 Trace ID: e067e1a90e24dd6776c2200a840f3cb0
 ├── GET /items/ (app.main) — 1624ms
@@ -517,6 +527,7 @@ Trace ID: e067e1a90e24dd6776c2200a840f3cb0
 ### Error Trace
 
 When PostgreSQL is stopped, the trace shows where the failure occurred:
+
 ```
 Trace ID: xxx
 ├── GET /items/ (app.main) — 52ms
@@ -534,6 +545,7 @@ The error appears in the `db_query` span, making it easy to identify the root ca
 ### MCP Tools Registered
 
 From nanobot startup logs:
+
 ```
 nanobot-1  | 2026-04-01 18:04:41.174 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_observability_logs_search' from server 'observability'
 nanobot-1  | 2026-04-01 18:04:41.174 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_observability_logs_error_count' from server 'observability'
@@ -542,25 +554,60 @@ nanobot-1  | 2026-04-01 18:04:41.174 | DEBUG | nanobot.agent.tools.mcp:connect_m
 nanobot-1  | 2026-04-01 18:04:41.174 | INFO  | nanobot.agent.tools.mcp:connect_mcp_servers:246 - MCP server 'observability': connected, 4 tools registered
 ```
 
-### Agent Response: "Any errors in the last hour?" (Normal conditions)
+### Agent Transcript: "What went wrong? Check the backend error logs and traces."
 
-To test the observability tools, connect to the nanobot WebSocket at `ws://localhost:8765?access_key=nano-access-key-secret` and ask:
+**Actual agent response from Flutter chat (2026-04-01 18:26 UTC):**
 
 ```
-Any errors in the last hour?
+I'll investigate the backend error logs and traces to find out what went wrong.
+
+[Agent queries observability tools...]
+
+## Investigation Results
+
+I found the issue. Here's what's wrong:
+
+### 🔴 **Backend Service is Unhealthy**
+- **LMS Health Check**: Returns `unhealthy` status with **HTTP 404** error
+- The backend service is not responding properly
+
+### 🔴 **Observability Infrastructure Issues**
+- **VictoriaLogs**: All queries fail with `JSONDecodeError` - the logs service appears to be down or returning empty responses
+- **VictoriaTraces**: Query failed with `400 Bad Request`
+
+### Summary
+
+The root cause is that the **backend service is down** (HTTP 404). The observability tools (logs and traces) are also failing, which could be:
+1. A consequence of the backend being unavailable
+2. A separate infrastructure issue with VictoriaLogs/VictoriaTraces services
+
+### Recommended Actions
+1. Check if the backend service process is running
+2. Verify backend service configuration and ports
+3. Restart the backend service if needed
+4. Check VictoriaLogs and VictoriaTraces services status
 ```
 
-**Expected agent flow:**
-1. Agent calls `logs_error_count(start="1h")` — finds 0 errors
-2. Agent reports: "No errors found. All services are healthy."
+### Agent Transcript: Health Check After Fix
 
-**Actual MCP tools registered (from nanobot logs):**
+After adding the `/health` endpoint and rebuilding:
+
 ```
-nanobot-1  | 2026-04-01 18:04:41.174 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_observability_logs_search' from server 'observability'
-nanobot-1  | 2026-04-01 18:04:41.174 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_observability_logs_error_count' from server 'observability'
-nanobot-1  | 2026-04-01 18:04:41.174 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_observability_traces_list' from server 'observability'
-nanobot-1  | 2026-04-01 18:04:41.174 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_observability_traces_get' from server 'observability'
-nanobot-1  | 2026-04-01 18:04:41.174 | INFO  | nanobot.agent.tools.mcp:connect_mcp_servers:246 - MCP server 'observability': connected, 4 tools registered
+## 🏥 Health Check Summary (18:26 UTC)
+
+**Backend Service**: ✅ **HEALTHY**
+- LMS backend responding normally
+- Item count: 56
+
+**Observability Infrastructure**: ⚠️ **DEGRADED**
+- VictoriaLogs: Not responding (empty/malformed responses)
+- VictoriaTraces: Query errors (400 Bad Request)
+
+**Recent Errors**: Unable to query (logs service unavailable)
+
+---
+
+**Status**: Backend is healthy, but monitoring infrastructure needs attention. No errors detectable due to logs service issues.
 ```
 
 ### Files Created/Modified for Task 3
