@@ -30,6 +30,9 @@ COPY --from=workspace nanobot-websocket-channel /app/nanobot-websocket-channel
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
 
+# Install MCP servers in the venv
+RUN /app/.venv/bin/pip install -e /app/mcp/mcp_lms -e /app/mcp/mcp_observability
+
 # ---
 # Stage 2: Final image
 # ---
